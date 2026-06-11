@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="../../modules/layout/layout.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    
+    <div id="app">
+    </div>
+
+    <template id="app-template">
+        <h1>👋 Hello, <get>name</get></h1>
+    </template>
+
+    <template-use id="app-template-use" template-id="app-template" mount-id="app">
+    </template-use>
+
+    <script type="module" src="index.js"></script>
+
+</body>
+</html>
