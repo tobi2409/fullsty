@@ -1,4 +1,4 @@
-projects/demo1/generated
-projects/demo1/modules
+projects/*/generated/
+projects/*/modules/
 node_modules/
 **/node_modules/
