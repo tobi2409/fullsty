@@ -1,0 +1,18 @@
+{
+  "name": "projects/db-test",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "scripts": {
+    "generate-server": "node modules/proc2rest/scripts/distro/express.js --appPath=. --srcServerDir=src/server --generatedServerDir=generated/server --configPath=proc2rest.config.json && node -e \"require('fs').copyFileSync('server-package.json','generated/server/package.json')\"",
+    "generate-client": "node modules/proc2rest/scripts/distro/fetch.js --appPath=. --srcClientDir=src/client --generatedClientDir=generated/client --configPath=proc2rest.config.json",
+    "generate": "npm run generate-server && npm run generate-client",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "ts-morph": "^25.0.0"
+  }
+}

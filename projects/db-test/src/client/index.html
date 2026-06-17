@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fullsty Demo 1</title>
+    <title>Document</title>
 
     <link rel="stylesheet" href="../../modules/layout/layout.css">
     <link rel="stylesheet" href="index.css">
@@ -15,8 +15,8 @@
 
     <template id="app-template">
         <h1>👋 Hello, <get>name</get></h1>
-        <button action-click="loadDbHealth">Check DB health</button>
-        <p>DB health: <get>dbHealthStatus</get></p>
+
+        <p><get>serverMessage</get></p>
     </template>
 
     <template-use id="app-template-use" template-id="app-template" mount-id="app">
