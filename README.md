@@ -42,7 +42,7 @@ This runs:
 - `generate-server` (creates server output in [projects/demo1/generated/server](projects/demo1/generated/server))
 - `generate-client` (creates client output in [projects/demo1/generated/client](projects/demo1/generated/client))
 
-It also copies [project-frame/server-config/package.json](project-frame/server-config/package.json) to `generated/server/package.json`.
+It also copies [project-frame/server-package.json](project-frame/server-package.json) to `generated/server/package.json`.
 
 ## 4) Use `fullsty-pkg` for wrapper packages
 
@@ -51,24 +51,25 @@ It also copies [project-frame/server-config/package.json](project-frame/server-c
 Run it from the project root, for example:
 
 ```bash
-../../fullsty-pkg.js add knex
-../../fullsty-pkg.js remove knex
+../../fullsty-pkg.js add pg
+../../fullsty-pkg.js add sql-template-tag
+../../fullsty-pkg.js remove pg
 ```
 
 What it does:
 
 - `add <package>`
-	- adds the package to [project-frame/server-package.json](project-frame/server-package.json)
+	- adds the package to the project's server package file, which is initially created from [project-frame/server-package.json](project-frame/server-package.json)
 	- copies a matching wrapper from [extension-wrappers](extension-wrappers) into [projects/demo1/src/server](projects/demo1/src/server)
 - `remove <package>`
-	- removes the package from [project-frame/server-package.json](project-frame/server-package.json)
+	- removes the package from the project's server package file
 	- removes the matching wrapper from [projects/demo1/src/server](projects/demo1/src/server)
 
 The script does not manage the project-level [package.json](project-frame/package.json).
 
-After `fullsty-pkg.js add <package>` you should run `npm run generate` again so the updated [project-frame/server-package.json](project-frame/server-package.json) is copied into `generated/server/package.json`. After that, run `npm install` again inside [projects/demo1/generated/server](projects/demo1/generated/server) so the generated server gets the updated dependencies.
+After `fullsty-pkg.js add <package>` you should run `npm run generate` again so the updated project server package file is copied into `generated/server/package.json`. After that, run `npm install` again inside [projects/demo1/generated/server](projects/demo1/generated/server) so the generated server gets the updated dependencies.
 
-Packages without an extension wrapper, such as `pg`, can also be added with `fullsty-pkg.js`. In that case the script only updates [project-frame/server-package.json](project-frame/server-package.json).
+`fullsty-pkg.js add sql-template-tag` copies [extension-wrappers/sql-template-tag/sql-template-tag-wrapper.ts](extension-wrappers/sql-template-tag/sql-template-tag-wrapper.ts) into [projects/demo1/src/server](projects/demo1/src/server). This keeps `sql-template-tag` visible as the recommended SQL style without coupling it to a specific DBMS wrapper. For PostgreSQL pooling and env handling you can add `pg` separately.
 
 ## 5) Start the generated server
 

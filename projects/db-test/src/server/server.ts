@@ -1,11 +1,8 @@
-import * as knexWrapper from './knex-wrapper'
+import * as pgWrapper from './pg-wrapper'
+import { sql } from './sql-template-tag-wrapper'
 
 // @rest
 export async function helloFromServer(name: string): Promise<string> {
-    const row = await knexWrapper.getKnexDatabase()
-        .select<{ dbTime: string }[]>(knexWrapper.getKnexDatabase().raw('now()::text as "dbTime"'))
-        .first()
-
-    const dbTime = row?.dbTime ?? 'unknown'
-    return `Hello, ${name}! DB time: ${dbTime}`
+    const result = await pgWrapper.getPgPool().query(sql`SELECT 1 AS number`)
+    return `Hello, ${name}! This is the server speaking. Query result: ${JSON.stringify(result.rows[0]['number'])}`
 }

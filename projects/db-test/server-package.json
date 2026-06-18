@@ -10,8 +10,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^5.2.1",
-    "knex": "latest",
-    "pg": "latest"
+    "pg": "latest",
+    "sql-template-tag": "latest"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
