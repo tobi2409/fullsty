@@ -1,19 +1,7 @@
-function readServerPackageJson(projectDir) {
-    const filePath = path.join(projectDir, "server-package.json");
-
-    if (!fs.existsSync(filePath)) {
-        throw new Error(`server-package.json not found: ${filePath}`);
-    }
-
-    return {
-        filePath,
-        json: JSON.parse(fs.readFileSync(filePath, "utf8")),
-    };
-}
-
-function writeServerPackageJson(filePath, json) {
-    fs.writeFileSync(filePath, `${JSON.stringify(json, null, 2)}\n`, "utf8");
-}
+import fs, { write } from "fs";
+import path from "path";
+import { copyDirectory } from "./file-copy.js";
+import { readJson, writeJson } from "./project-json-utils.js";
 
 function wrapperDirFromPackage(scriptDir, packageName) {
     return path.join(scriptDir, "extension-wrappers", packageName);
@@ -30,6 +18,7 @@ function removeWrapperFiles(sourceWrapperDir, targetServerDir) {
             if (fs.existsSync(targetPath)) {
                 removeWrapperFiles(sourcePath, targetPath);
             }
+
             continue;
         }
 
@@ -40,7 +29,7 @@ function removeWrapperFiles(sourceWrapperDir, targetServerDir) {
 }
 
 export function handleAdd(projectDir, scriptDir, serverDir, packageNames) {
-    const { filePath, json } = readServerPackageJson(projectDir);
+    const json = readJson(projectDir, "server-package.json");
 
     if (!json.dependencies || typeof json.dependencies !== "object") {
         json.dependencies = {};
@@ -57,11 +46,11 @@ export function handleAdd(projectDir, scriptDir, serverDir, packageNames) {
         }
     }
 
-    writeServerPackageJson(filePath, json);
+    writeJson(projectDir, "server-package.json", json);
 }
 
 export function handleRemove(projectDir, scriptDir, serverDir, packageNames) {
-    const { filePath, json } = readServerPackageJson(projectDir);
+    const json = readJson(projectDir, "server-package.json");
 
     if (!json.dependencies || typeof json.dependencies !== "object") {
         json.dependencies = {};
@@ -79,11 +68,12 @@ export function handleRemove(projectDir, scriptDir, serverDir, packageNames) {
 
         if (fs.existsSync(wrapperDir)) {
             removeWrapperFiles(wrapperDir, serverDir);
+            
             console.log(
                 `\n✅ Removed wrapper for ${packageName} from src/server`,
             );
         }
     }
 
-    writeServerPackageJson(filePath, json);
+    writeJson(projectDir, "server-package.json", json);
 }

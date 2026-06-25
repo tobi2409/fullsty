@@ -1,25 +1,15 @@
 #!/usr/bin/env node
 
-const fs = require("fs");
-const path = require("path");
-const { spawnSync } = require("child_process");
+import fs from "fs";
+import path from "path";
+import { copyDirectory } from "./shared/file-copy.js";
+import { readJson, writeJson } from "./shared/project-json-utils.js";
 
 // Update package.json name in the copied project frame.
 function updatePackageName(targetProjectDir, projectName) {
-    const packageJsonPath = path.join(targetProjectDir, "package.json");
-
-    if (!fs.existsSync(packageJsonPath)) {
-        return;
-    }
-
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+    const packageJson = readJson(targetProjectDir, "package.json");
     packageJson.name = projectName;
-
-    fs.writeFileSync(
-        packageJsonPath,
-        `${JSON.stringify(packageJson, null, 2)}\n`,
-        "utf8",
-    );
+    writeJson(targetProjectDir, "package.json", packageJson);
 }
 
 function main() {
@@ -30,7 +20,7 @@ function main() {
         process.exit(1);
     }
 
-    const scriptDir = __dirname;
+    const scriptDir = path.dirname(new URL(import.meta.url).pathname);
     const sourceFrameDir = path.join(scriptDir, "project-frame");
     const targetProjectDir = path.resolve(process.cwd(), projectName);
 
@@ -44,17 +34,6 @@ function main() {
 
     copyDirectory(sourceFrameDir, targetProjectDir);
     updatePackageName(targetProjectDir, projectName);
-
-    const modulesDir = path.join(targetProjectDir, "modules");
-    fs.mkdirSync(modulesDir, { recursive: true });
-
-    const packageNames = [
-        "@tobi2409/template-engine",
-        "@tobi2409/layout",
-        "@tobi2409/proc2rest",
-    ];
-
-    handleAdd(targetProjectDir, scriptDir, path.join(targetProjectDir, "src", "server"), packageNames);
 
     console.log(`\n✅ Project created: ${targetProjectDir}`);
 }

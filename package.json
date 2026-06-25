@@ -1,0 +1,63 @@
+{
+    "name": "fullsty",
+    "version": "0.5.0",
+    "description": "Fullsty is a modular fullstack framework starter built from three core parts: template-engine, layout and proc2rest. It provides a project frame for building fullstack applications with a clear separation of client and server code.",
+    "license": "ISC",
+    "author": "Tobias Hollstein",
+    "type": "module",
+    "main": "./scripts/create-project.js",
+    "bin": {
+        "create-fullsty-project": "./scripts/create-project.js",
+        "fullsty-server-pkg": "./scripts/fullsty-server-pkg.js"
+    },
+    "files": [
+        "scripts",
+        "README.md"
+    ],
+    "keywords": [
+        "codegen",
+        "typescript",
+        "express",
+        "expressjs",
+        "rest",
+        "rest-api",
+        "api",
+        "api-generator",
+        "client-generator",
+        "javascript-client",
+        "fetch",
+        "msgpack",
+        "messagepack",
+        "ts-morph",
+        "node",
+        "nodejs",
+        "npm-cli",
+        "automation",
+        "scaffolding",
+        "rpc",
+        "backend",
+        "template-engine",
+        "reactive",
+        "mvvm",
+        "frontend",
+        "declarative",
+        "data-binding",
+        "dom",
+        "html",
+        "vanilla-js",
+        "rendering",
+        "javascript",
+        "template"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "homepage": "https://github.com/tobi2409/fullsty#readme",
+    "bugs": {
+        "url": "https://github.com/tobi2409/fullsty/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/tobi2409/fullsty.git"
+    }
+}

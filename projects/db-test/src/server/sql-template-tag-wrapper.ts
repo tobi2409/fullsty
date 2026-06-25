@@ -1,1 +1,1 @@
-export { default as sql } from 'sql-template-tag'
+export { default as sql } from "sql-template-tag";

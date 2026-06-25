@@ -1,9 +1,11 @@
 {
     "jsClients": ["src/client/index.js"],
-    "servers": [{
-        "src": "src/server/server.ts",
-        "namespace": "Server"
-    }],
+    "servers": [
+        {
+            "src": "src/server/server.ts",
+            "namespace": "Server"
+        }
+    ],
     "apiUrl": "http://localhost:3000",
     "cors": {
         "origin": "*"

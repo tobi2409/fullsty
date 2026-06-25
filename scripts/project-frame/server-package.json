@@ -1,5 +1,5 @@
 {
-    "name": "proc2rest-generated-server",
+    "name": "generated-server",
     "private": true,
     "type": "module",
     "scripts": {

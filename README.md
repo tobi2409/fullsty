@@ -10,12 +10,16 @@ This repository provides a project template and scaffolding script so you can cr
 
 Minimal Fullsty starter workflow.
 
+**It is recommended to install fullsty globally.**
+
+A sample application can be found at https://github.com/tobi2409/fullsty/tree/main/projects/db-test
+
 ## 1) Create a project
 
 From the repository root:
 
 ```bash
-./create-project.js projects/demo1
+npx create-fullsty-project projects/demo1
 ```
 
 This creates a new folder (for example [projects/demo1](projects/demo1)).
@@ -42,7 +46,7 @@ This runs:
 - `generate-server` (creates server output in [projects/demo1/generated/server](projects/demo1/generated/server))
 - `generate-client` (creates client output in [projects/demo1/generated/client](projects/demo1/generated/client))
 
-It also copies [project-frame/server-package.json](project-frame/server-package.json) to `generated/server/package.json`.
+It also copies [project-frame/server-package.json](project-frame/server-package.json) to `generated/server/package.json` and [project-frame/client-package.json](project-frame/client-package.json) to `generated/client/package.json`.
 
 ## 4) Use `fullsty-pkg` for wrapper packages
 
@@ -51,10 +55,12 @@ It also copies [project-frame/server-package.json](project-frame/server-package.
 Run it from the project root, for example:
 
 ```bash
-../../fullsty-pkg.js add pg
-../../fullsty-pkg.js add sql-template-tag
-../../fullsty-pkg.js remove pg
+../../scripts/fullsty-server-pkg.js add pg
+../../scripts/fullsty-server-pkg.js add sql-template-tag
+../../scripts/fullsty-server-pkg.js remove pg
 ```
+
+Alternatively, you can also use npx fullsty-server-pkg.
 
 What it does:
 
@@ -67,9 +73,9 @@ What it does:
 
 The script does not manage the project-level [package.json](project-frame/package.json).
 
-After `fullsty-pkg.js add <package>` you should run `npm run generate` again so the updated project server package file is copied into `generated/server/package.json`. After that, run `npm install` again inside [projects/demo1/generated/server](projects/demo1/generated/server) so the generated server gets the updated dependencies.
+After `fullsty-server-pkg.js add <package>` you should run `npm run generate` again so the updated project server package file is copied into `generated/server/package.json`. After that, run `npm install` again inside [projects/demo1/generated/server](projects/demo1/generated/server) so the generated server gets the updated dependencies.
 
-`fullsty-pkg.js add sql-template-tag` copies [extension-wrappers/sql-template-tag/sql-template-tag-wrapper.ts](extension-wrappers/sql-template-tag/sql-template-tag-wrapper.ts) into [projects/demo1/src/server](projects/demo1/src/server). This keeps `sql-template-tag` visible as the recommended SQL style without coupling it to a specific DBMS wrapper. For PostgreSQL pooling and env handling you can add `pg` separately.
+`fullsty-server-pkg.js add sql-template-tag` copies [extension-wrappers/sql-template-tag/sql-template-tag-wrapper.ts](extension-wrappers/sql-template-tag/sql-template-tag-wrapper.ts) into [projects/demo1/src/server](projects/demo1/src/server). This keeps `sql-template-tag` visible as the recommended SQL style without coupling it to a specific DBMS wrapper. For PostgreSQL pooling and env handling you can add `pg` separately.
 
 ## 5) Start the generated server
 
@@ -88,6 +94,28 @@ npm run start
 - Generated server package file: [project-frame/server-package.json](project-frame/server-package.json)
 	- Becomes `generated/server/package.json`.
 	- Used to run the generated server (`npm run start`).
+
+## 6) Install client dependencies
+
+Move to the generated client folder and install the dependencies:
+
+```bash
+cd generated/client
+npm install
+```
+
+## VS Code Setup
+
+To prevent Live Server from reloading when server logs are written, add this to `.vscode/settings.json`:
+
+```json
+{
+    "liveServer.settings.ignoreFiles": [
+        "**/generated/server/logs/**",
+        "**/*.log"
+    ]
+}
+```
 
 ## Quick summary
 

@@ -1,5 +1,8 @@
+import fs from "fs";
+import path from "path";
+
 // Recursively copy a directory and all nested files/folders.
-function copyDirectory(sourceDir, targetDir) {
+export function copyDirectory(sourceDir, targetDir) {
     fs.mkdirSync(targetDir, { recursive: true });
     const entries = fs.readdirSync(sourceDir, { withFileTypes: true });
 

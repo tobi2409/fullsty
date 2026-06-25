@@ -1,6 +1,6 @@
 // @server-import server.ts
 
-import TemplateEngine from '../../modules/template-engine/src/template-engine.js'
+import TemplateEngine from 'template-engine/template-engine.js'
 
 const data = TemplateEngine.reactive({
     name: 'my friend',
