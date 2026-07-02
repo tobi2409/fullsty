@@ -1,31 +1,17 @@
-import fs, { write } from "fs";
+import fs from "fs";
 import path from "path";
 import { copyDirectory } from "./file-copy.js";
 import { readJson, writeJson } from "./project-json-utils.js";
+
+const EXTENSION_CONFIG_FILE = "extension.json";
 
 function wrapperDirFromPackage(scriptDir, packageName) {
     return path.join(scriptDir, "extension-wrappers", packageName);
 }
 
-function removeWrapperFiles(sourceWrapperDir, targetServerDir) {
-    const entries = fs.readdirSync(sourceWrapperDir, { withFileTypes: true });
-
-    for (const entry of entries) {
-        const sourcePath = path.join(sourceWrapperDir, entry.name);
-        const targetPath = path.join(targetServerDir, entry.name);
-
-        if (entry.isDirectory()) {
-            if (fs.existsSync(targetPath)) {
-                removeWrapperFiles(sourcePath, targetPath);
-            }
-
-            continue;
-        }
-
-        if (fs.existsSync(targetPath)) {
-            fs.rmSync(targetPath, { force: true });
-        }
-    }
+function shouldAddToServerPackage(wrapperDir) {
+    const extensionConfig = readJson(wrapperDir, EXTENSION_CONFIG_FILE);
+    return extensionConfig.addToServerPackage;
 }
 
 export function handleAdd(projectDir, scriptDir, serverDir, packageNames) {
@@ -37,12 +23,17 @@ export function handleAdd(projectDir, scriptDir, serverDir, packageNames) {
 
     for (const packageName of packageNames) {
         const wrapperDir = wrapperDirFromPackage(scriptDir, packageName);
+        const targetWrapperDir = path.join(serverDir, packageName);
 
-        json.dependencies[packageName] = "latest";
+        if (shouldAddToServerPackage(wrapperDir)) {
+            json.dependencies[packageName] = "latest";
+        }
 
         if (fs.existsSync(wrapperDir)) {
-            copyDirectory(wrapperDir, serverDir);
-            console.log(`\n✅ Copied wrapper for ${packageName} to src/server`);
+            copyDirectory(wrapperDir, targetWrapperDir, {
+                excludedNames: [EXTENSION_CONFIG_FILE],
+            });
+            console.log(`\n✅ Copied wrapper for ${packageName} to src/server/${packageName}`);
         }
     }
 
@@ -62,15 +53,18 @@ export function handleRemove(projectDir, scriptDir, serverDir, packageNames) {
 
     for (const packageName of packageNames) {
         const wrapperDir = wrapperDirFromPackage(scriptDir, packageName);
+        const targetWrapperDir = path.join(serverDir, packageName);
 
-        delete json.dependencies[packageName];
-        delete json.devDependencies[packageName];
+        if (shouldAddToServerPackage(wrapperDir)) {
+            delete json.dependencies[packageName];
+            delete json.devDependencies[packageName];
+        }
 
-        if (fs.existsSync(wrapperDir)) {
-            removeWrapperFiles(wrapperDir, serverDir);
-            
+        if (fs.existsSync(wrapperDir) && fs.existsSync(targetWrapperDir)) {
+            fs.rmSync(targetWrapperDir, { recursive: true, force: true });
+
             console.log(
-                `\n✅ Removed wrapper for ${packageName} from src/server`,
+                `\n✅ Removed wrapper for ${packageName} from src/server/${packageName}`,
             );
         }
     }

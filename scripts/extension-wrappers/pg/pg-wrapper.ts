@@ -1,10 +1,14 @@
 import dotenv from "dotenv";
 import fs from "fs";
+import path from "path";
 import { Pool } from "pg";
+import { fileURLToPath } from "url";
 
 const pools = new Map<string, Pool>();
 let pgEnv: Record<string, string> = {};
 let pgEnvLoaded = false;
+const wrapperDir = path.dirname(fileURLToPath(import.meta.url));
+const envFilePath = path.join(wrapperDir, ".env.pg");
 
 function envKey(connectionName: string, key: string): string {
     const prefix = connectionName.toUpperCase().replace(/[^A-Z0-9_]/g, "_");
@@ -19,8 +23,8 @@ function loadPgEnv(): void {
     // Load .env.pg into a local cache instead of writing into process.env.
     // This keeps the pg wrapper isolated from other wrappers such as auth,
     // which may load their own .env files later.
-    const envFileContent = fs.existsSync(".env.pg")
-        ? fs.readFileSync(".env.pg", "utf8")
+    const envFileContent = fs.existsSync(envFilePath)
+        ? fs.readFileSync(envFilePath, "utf8")
         : "";
 
     pgEnv = dotenv.parse(envFileContent);
