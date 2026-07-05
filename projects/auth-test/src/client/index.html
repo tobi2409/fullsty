@@ -24,23 +24,26 @@
     <template id="app-template">
         <div class="login">
             <h3>Login</h3>
-            <input type="text" placeholder="Username" bind-input-value="login.email" class="username">
-            <input type="text" placeholder="Password" bind-input-value="login.password" class="password">
-            <button action-click="login.okClick" class="ok">Login</button>
+            <input type="text" placeholder="Username" bind-input-value="loginSection.email" class="username">
+            <input type="text" placeholder="Password" bind-input-value="loginSection.password" class="password">
+            <button action-click="loginSection.okClick" class="ok">Login</button>
+            <p style-color="loginSection.statusColor"><get>loginSection.statusMessage</get></p>
         </div>
 
         <div class="register">
             <h3>Register</h3>
-            <input type="text" placeholder="Username" bind-input-value="register.email" class="username">
-            <input type="text" placeholder="Password" bind-input-value="register.password" class="password">
-            <button action-click="register.okClick" class="ok">Register</button>
+            <input type="text" placeholder="Username" bind-input-value="registerSection.email" class="username">
+            <input type="text" placeholder="Password" bind-input-value="registerSection.password" class="password">
+            <button action-click="registerSection.okClick" class="ok">Register</button>
+            <p style-color="registerSection.statusColor"><get>registerSection.statusMessage</get></p>
             <p>You have to activate the account in database</p>
         </div>
 
         <div class="get-current-user">
             <h3>Token after Login:</h3>
-            <input type="text" placeholder="Token" bind-input-value="currentUser.token" class="token">
-            <button action-click="currentUser.okClick" class="ok">Get Current User</button>
+            <input type="text" placeholder="Token" bind-input-value="currentUserSection.token" class="token">
+            <button action-click="currentUserSection.okClick" class="ok">Get Current User</button>
+            <p style-color="currentUserSection.statusColor">Current User UUID: <get>currentUserSection.statusMessage</get></p>
         </div>
     </template>
 
