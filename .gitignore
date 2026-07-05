@@ -1,6 +1,7 @@
 projects/*/src/server/pg/
 projects/*/src/server/db-connection/
 projects/*/src/server/kysely/
+projects/*/src/server/@tobi2409/
 projects/*/generated/
 projects/*/modules/
 node_modules/

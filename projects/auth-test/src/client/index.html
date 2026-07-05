@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "template-engine/": "./node_modules/@tobi2409/template-engine/src/"
+        }
+    }
+    </script>
+
+    <link rel="stylesheet" href="node_modules/@tobi2409/layout/src/layout.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    
+    <div id="app">
+    </div>
+
+    <template id="app-template">
+        <div class="login">
+            <h3>Login</h3>
+            <input type="text" placeholder="Username" bind-input-value="login.email" class="username">
+            <input type="text" placeholder="Password" bind-input-value="login.password" class="password">
+            <button action-click="login.okClick" class="ok">Login</button>
+        </div>
+
+        <div class="register">
+            <h3>Register</h3>
+            <input type="text" placeholder="Username" bind-input-value="register.email" class="username">
+            <input type="text" placeholder="Password" bind-input-value="register.password" class="password">
+            <button action-click="register.okClick" class="ok">Register</button>
+            <p>You have to activate the account in database</p>
+        </div>
+
+        <div class="get-current-user">
+            <h3>Token after Login:</h3>
+            <input type="text" placeholder="Token" bind-input-value="currentUser.token" class="token">
+            <button action-click="currentUser.okClick" class="ok">Get Current User</button>
+        </div>
+    </template>
+
+    <template-use id="app-template-use" template-id="app-template" mount-id="app">
+    </template-use>
+
+    <script type="module" src="index.js"></script>
+
+</body>
+</html>
