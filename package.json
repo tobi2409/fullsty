@@ -1,6 +1,6 @@
 {
     "name": "@tobi2409/fullsty",
-    "version": "0.5.2",
+    "version": "0.5.3",
     "description": "Fullsty is a modular fullstack framework starter built from three core parts: template-engine, layout and proc2rest. It provides a project frame for building fullstack applications with a clear separation of client and server code.",
     "license": "ISC",
     "author": "Tobias Hollstein",
