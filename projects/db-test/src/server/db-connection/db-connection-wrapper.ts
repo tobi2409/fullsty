@@ -1,29 +1,41 @@
-// @ts-ignore pg-wrapper is supplied by the pg extension in generated projects.
-import { getPgPool, closeAllPgPools } from "../pg/pg-wrapper";
-
 type DriverName = "pg" | "mysql" | "sqlite";
 
-type ConnectionData = {
+interface ConnectionData {
     connectionName?: string;
 };
 
 export class DbConnection {
+    private connectionWrapper?: unknown;
+
     constructor(
         private readonly driverName: DriverName,
-        private readonly connectionData: ConnectionData = {},
+        private readonly connectionData: ConnectionData = {}
     ) {}
 
-    connect() {
+    getDriverName(): DriverName {
+        return this.driverName;
+    }
+
+    async getConnection(): Promise<unknown> {
         if (this.driverName === "pg") {
-            return getPgPool(this.connectionData.connectionName ?? "default");
+            if (!this.connectionWrapper) {
+                // @ts-ignore pg-connection-wrapper is supplied by the pg extension in generated projects.
+                const { PgConnectionWrapper } = await import("../pg/pg-wrapper.ts");
+                this.connectionWrapper = new PgConnectionWrapper(this.connectionData.connectionName ?? "default");
+            }
+
+            return (this.connectionWrapper as any).getPgPool();
         }
 
         throw new Error(`Driver is not integrated yet: ${this.driverName}`);
     }
 
-    async close() {
+    async close(): Promise<void> {
         if (this.driverName === "pg") {
-            await closeAllPgPools();
+            if (this.connectionWrapper) {
+                await (this.connectionWrapper as any).closePool();
+            }
+
             return;
         }
 

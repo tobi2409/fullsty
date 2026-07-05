@@ -1,82 +1,73 @@
+// @ts-ignore pg dependencies are supplied by the server package in generated projects.
 import dotenv from "dotenv";
+// @ts-ignore node types are supplied by the server package in generated projects.
 import fs from "fs";
+// @ts-ignore node types are supplied by the server package in generated projects.
 import path from "path";
+// @ts-ignore pg dependencies are supplied by the server package in generated projects.
 import { Pool } from "pg";
+// @ts-ignore node types are supplied by the server package in generated projects.
 import { fileURLToPath } from "url";
 
-const pools = new Map<string, Pool>();
-let pgEnv: Record<string, string> = {};
-let pgEnvLoaded = false;
-const wrapperDir = path.dirname(fileURLToPath(import.meta.url));
-const envFilePath = path.join(wrapperDir, ".env.pg");
+export class PgConnectionWrapper {
+    private pool: Pool | null = null;
+    private pgEnv: Record<string, string> = {};
+    private pgEnvLoaded: boolean = false;
+    private readonly wrapperDir: string = path.dirname(fileURLToPath(import.meta.url));
+    private readonly envFilePath: string = path.join(this.wrapperDir, ".env.pg");
 
-function envKey(connectionName: string, key: string): string {
-    const prefix = connectionName.toUpperCase().replace(/[^A-Z0-9_]/g, "_");
-    return `${prefix}_${key}`;
-}
+    constructor(private readonly connectionName: string = "default") {}
 
-function loadPgEnv(): void {
-    if (pgEnvLoaded) {
-        return;
+    private envKey(key: string): string {
+        const prefix = this.connectionName.toUpperCase().replace(/[^A-Z0-9_]/g, "_");
+        return `${prefix}_${key}`;
     }
 
-    // Load .env.pg into a local cache instead of writing into process.env.
-    // This keeps the pg wrapper isolated from other wrappers such as auth,
-    // which may load their own .env files later.
-    const envFileContent = fs.existsSync(envFilePath)
-        ? fs.readFileSync(envFilePath, "utf8")
-        : "";
+    private loadPgEnv(): void {
+        // only load the .env.pg file once
+        if (this.pgEnvLoaded) {
+            return;
+        }
 
-    pgEnv = dotenv.parse(envFileContent);
-    pgEnvLoaded = true;
-}
+        // Load .env.pg into a local cache instead of writing into process.env.
+        // This keeps the pg wrapper isolated from other wrappers such as auth,
+        // which may load their own .env files later.
+        const envFileContent = fs.existsSync(this.envFilePath)
+            ? fs.readFileSync(this.envFilePath, "utf8")
+            : "";
 
-function getEnv(
-    connectionName: string,
-    key: string,
-    fallback?: string,
-): string {
-    loadPgEnv();
-    return pgEnv[envKey(connectionName, key)] ?? fallback ?? "";
-}
-
-export function getPgPool(connectionName: string = "default"): Pool {
-    const existing = pools.get(connectionName);
-    if (existing) {
-        return existing;
+        this.pgEnv = dotenv.parse(envFileContent);
+        this.pgEnvLoaded = true;
     }
 
-    const pool = new Pool({
-        host: getEnv(connectionName, "PGHOST", "127.0.0.1"),
-        port: Number(getEnv(connectionName, "PGPORT", "5432")),
-        user: getEnv(connectionName, "PGUSER", "postgres"),
-        password: getEnv(connectionName, "PGPASSWORD", "postgres"),
-        database: getEnv(connectionName, "PGDATABASE", "fullsty_demo"),
-        max: Number(getEnv(connectionName, "POOL_MAX", "10")),
-    });
-
-    pools.set(connectionName, pool);
-    return pool;
-}
-
-export async function closePgPool(
-    connectionName: string = "default",
-): Promise<void> {
-    const pool = pools.get(connectionName);
-
-    if (!pool) {
-        return;
+    private getEnv(key: string, fallback?: string): string {
+        this.loadPgEnv();
+        return this.pgEnv[this.envKey(key)] ?? fallback ?? "";
     }
 
-    await pool.end();
-    pools.delete(connectionName);
-}
+    getPgPool(): Pool {
+        if (this.pool) {
+            return this.pool;
+        }
 
-export async function closeAllPgPools(): Promise<void> {
-    const all = [...pools.entries()];
+        this.pool = new Pool({
+            host: this.getEnv("PGHOST", "127.0.0.1"),
+            port: Number(this.getEnv("PGPORT", "5432")),
+            user: this.getEnv("PGUSER", "postgres"),
+            password: this.getEnv("PGPASSWORD", "postgres"),
+            database: this.getEnv("PGDATABASE", "fullsty_demo"),
+            max: Number(this.getEnv("POOL_MAX", "10"))
+        });
 
-    for (const [name, pool] of all) {
-        await pool.end();
-        pools.delete(name);
+        return this.pool;
+    }
+
+    async closePool(): Promise<void> {
+        if (!this.pool) {
+            return;
+        }
+
+        await this.pool.end();
+        this.pool = null;
     }
 }
