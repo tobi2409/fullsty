@@ -19,8 +19,8 @@ export class DbConnection {
     async getConnection(): Promise<unknown> {
         if (this.driverName === "pg") {
             if (!this.connectionWrapper) {
-                // @ts-ignore pg-connection-wrapper is supplied by the pg extension in generated projects.
-                const { PgConnectionWrapper } = await import("../pg/pg-connection-wrapper.ts");
+                // @ts-ignore pg-wrapper is supplied by the pg extension in generated projects.
+                const { PgConnectionWrapper } = await import("../pg/pg-wrapper.ts");
                 this.connectionWrapper = new PgConnectionWrapper(this.connectionData.connectionName ?? "default");
             }
 
