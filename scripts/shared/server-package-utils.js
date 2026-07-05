@@ -24,17 +24,21 @@ export function handleAdd(projectDir, scriptDir, serverDir, packageNames) {
     for (const packageName of packageNames) {
         const wrapperDir = wrapperDirFromPackage(scriptDir, packageName);
         const targetWrapperDir = path.join(serverDir, packageName);
+        const wrapperExists = fs.existsSync(wrapperDir);
+
+        if (!wrapperExists) {
+            json.dependencies[packageName] = "latest";
+            continue;
+        }
 
         if (shouldAddToServerPackage(wrapperDir)) {
             json.dependencies[packageName] = "latest";
         }
 
-        if (fs.existsSync(wrapperDir)) {
-            copyDirectory(wrapperDir, targetWrapperDir, {
-                excludedNames: [EXTENSION_CONFIG_FILE],
-            });
-            console.log(`\n✅ Copied wrapper for ${packageName} to src/server/${packageName}`);
-        }
+        copyDirectory(wrapperDir, targetWrapperDir, {
+            excludedNames: [EXTENSION_CONFIG_FILE],
+        });
+        console.log(`\n✅ Copied wrapper for ${packageName} to src/server/${packageName}`);
     }
 
     writeJson(projectDir, "server-package.json", json);
@@ -54,13 +58,20 @@ export function handleRemove(projectDir, scriptDir, serverDir, packageNames) {
     for (const packageName of packageNames) {
         const wrapperDir = wrapperDirFromPackage(scriptDir, packageName);
         const targetWrapperDir = path.join(serverDir, packageName);
+        const wrapperExists = fs.existsSync(wrapperDir);
+
+        if (!wrapperExists) {
+            delete json.dependencies[packageName];
+            delete json.devDependencies[packageName];
+            continue;
+        }
 
         if (shouldAddToServerPackage(wrapperDir)) {
             delete json.dependencies[packageName];
             delete json.devDependencies[packageName];
         }
 
-        if (fs.existsSync(wrapperDir) && fs.existsSync(targetWrapperDir)) {
+        if (fs.existsSync(targetWrapperDir)) {
             fs.rmSync(targetWrapperDir, { recursive: true, force: true });
 
             console.log(

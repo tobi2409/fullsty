@@ -14,12 +14,20 @@ Minimal Fullsty starter workflow.
 
 A sample application can be found at https://github.com/tobi2409/fullsty/tree/main/projects/db-test
 
+For the `db-test` demo, add the required server wrappers in your project root before generating/running:
+
+```bash
+fullsty-server-pkg add pg
+fullsty-server-pkg add db-connection
+fullsty-server-pkg add kysely
+```
+
 ## 1) Create a project
 
 From the repository root:
 
 ```bash
-npx create-fullsty-project projects/demo1
+create-fullsty-project projects/demo1
 ```
 
 This creates a new folder (for example [projects/demo1](projects/demo1)).
@@ -55,12 +63,12 @@ It also copies [project-frame/server-package.json](project-frame/server-package.
 Run it from the project root, for example:
 
 ```bash
-../../scripts/fullsty-server-pkg.js add pg
-../../scripts/fullsty-server-pkg.js add kysely
-../../scripts/fullsty-server-pkg.js remove pg
+fullsty-server-pkg add pg
+fullsty-server-pkg add kysely
+fullsty-server-pkg remove pg
 ```
 
-Alternatively, you can also use npx fullsty-server-pkg.
+Alternatively, you can also use `npx fullsty-server-pkg`.
 
 What it does:
 

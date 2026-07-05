@@ -1,3 +1,6 @@
+projects/*/src/server/pg/
+projects/*/src/server/db-connection/
+projects/*/src/server/kysely/
 projects/*/generated/
 projects/*/modules/
 node_modules/
