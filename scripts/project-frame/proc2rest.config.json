@@ -6,16 +6,25 @@
             "namespace": "Server"
         }
     ],
+    "rawServerFiles": [],
     "apiUrl": "http://localhost:3000",
     "cors": {
-        "origin": "*"
+        "allowOrigin": "*"
     },
+    "rateLimit": {
+        "windowDurationMs": 900000,
+        "maxRequests": 100,
+        "useStandardHeaders": true,
+        "useLegacyHeaders": false
+    },
+    "errorStatusCodes": {},
     "method-rules": {
         "GET": "^(get|list|find)",
         "POST": "^(create|add|insert)",
         "PATCH": "^(update|set|patch)",
         "DELETE": "^(delete|remove)"
     },
+    "method-rules-custom-functions": {},
     "binaryTypes": [
         "ArrayBuffer",
         "Uint8Array",

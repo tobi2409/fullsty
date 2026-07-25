@@ -12,6 +12,6 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "devDependencies": {
-        "@tobi2409/proc2rest": "^0.4.1"
+        "@tobi2409/proc2rest": "^0.5.0"
     }
 }

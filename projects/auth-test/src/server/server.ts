@@ -12,17 +12,23 @@ const SECRET_KEY = 'zLp6Qzrm76vCcM3YoihruIcaYktJjc2Xt/c9qftftx4='
 const dbConnection = new DbConnection('pg')
 
 //@rest
-export async function loginUser(email: string, password: string): Promise<string> {
+export async function loginUser(
+    email: string,
+    password: string
+): Promise<string> {
     return AuthenticationCoreKyselyLogin.login(
         email,
         password,
         SECRET_KEY,
-        dbConnection,
+        dbConnection
     )
 }
 
 //@rest
-export async function registerUser(email: string, password: string): Promise<void> {
+export async function registerUser(
+    email: string,
+    password: string
+): Promise<void> {
     const registrationInputData: RegistrationInputData = {
         typedMail: email,
         typedPassword: password,
@@ -32,7 +38,8 @@ export async function registerUser(email: string, password: string): Promise<voi
     const verificationMail: VerificationMail = {
         from: 'no-reply@local.test',
         subject: 'Verify your account',
-        content: (uuid: string) => `Please verify your account by clicking the following link: https://example.com/verify?uuid=${uuid}`
+        content: (uuid: string) =>
+            `Please verify your account by clicking the following link: https://example.com/verify?uuid=${uuid}`
     }
 
     const mailTransportConfig: MailTransportConfig = {
@@ -52,7 +59,7 @@ export async function registerUser(email: string, password: string): Promise<voi
         dbConnection,
         undefined,
         undefined,
-        mailTransportConfig,
+        mailTransportConfig
     )
 }
 
@@ -61,6 +68,6 @@ export async function getCurrentUser(token: string): Promise<string> {
     return AuthenticationCoreKyselyCurrentUser.getCurrentUser(
         token,
         SECRET_KEY,
-        dbConnection,
+        dbConnection
     )
 }

@@ -1,36 +1,40 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
 
-    <script type="importmap">
-    {
-        "imports": {
-            "template-engine/": "./node_modules/@tobi2409/template-engine/src/"
-        }
-    }
-    </script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "template-engine/": "./node_modules/@tobi2409/template-engine/src/"
+                }
+            }
+        </script>
 
-    <link rel="stylesheet" href="node_modules/@tobi2409/layout/src/layout.css">
-    <link rel="stylesheet" href="index.css">
-</head>
-<body>
-    
-    <div id="app">
-    </div>
+        <link
+            rel="stylesheet"
+            href="node_modules/@tobi2409/layout/src/layout.css"
+        />
+        <link rel="stylesheet" href="index.css" />
+    </head>
+    <body>
+        <div id="app"></div>
 
-    <template id="app-template">
-        <h1>👋 Hello, <get>name</get></h1>
+        <template id="app-template">
+            <h1>👋 Hello, <get>name</get></h1>
 
-        <p><get>serverMessage</get></p>
-    </template>
+            <p><get>serverMessage</get></p>
+        </template>
 
-    <template-use id="app-template-use" template-id="app-template" mount-id="app">
-    </template-use>
+        <template-use
+            id="app-template-use"
+            template-id="app-template"
+            mount-id="app"
+        >
+        </template-use>
 
-    <script type="module" src="index.js"></script>
-
-</body>
+        <script type="module" src="index.js"></script>
+    </body>
 </html>

@@ -73,11 +73,11 @@ Alternatively, you can also use `npx fullsty-server-pkg`.
 What it does:
 
 - `add <package>`
-	- adds the package to the project's server package file, which is initially created from [project-frame/server-package.json](project-frame/server-package.json)
-	- copies a matching wrapper from [scripts/extension-wrappers](scripts/extension-wrappers) into [projects/demo1/src/server](projects/demo1/src/server)
+    - adds the package to the project's server package file, which is initially created from [project-frame/server-package.json](project-frame/server-package.json)
+    - copies a matching wrapper from [scripts/extension-wrappers](scripts/extension-wrappers) into [projects/demo1/src/server](projects/demo1/src/server)
 - `remove <package>`
-	- removes the package from the project's server package file
-	- removes the matching wrapper from [projects/demo1/src/server](projects/demo1/src/server)
+    - removes the package from the project's server package file
+    - removes the matching wrapper from [projects/demo1/src/server](projects/demo1/src/server)
 
 The script does not manage the project-level [package.json](project-frame/package.json).
 
@@ -98,10 +98,10 @@ npm run start
 ## package.json responsibilities
 
 - Project-level package file: [project-frame/package.json](project-frame/package.json)
-	- Used for generation tasks (`generate-server`, `generate-client`, `generate`).
+    - Used for generation tasks (`generate-server`, `generate-client`, `generate`).
 - Generated server package file: [project-frame/server-package.json](project-frame/server-package.json)
-	- Becomes `generated/server/package.json`.
-	- Used to run the generated server (`npm run start`).
+    - Becomes `generated/server/package.json`.
+    - Used to run the generated server (`npm run start`).
 
 ## 6) Install client dependencies
 
