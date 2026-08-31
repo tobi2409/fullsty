@@ -1,5 +1,7 @@
 # fullsty
 
+ROADMAP: Platform-Independency (generate Fullsty-App as Web-App, Mobile-App, Win32-App) but with native UI-Elements - eg. CreateWindowEx(hwnd, ...) instead of just using a WebView in Desktop-Apps
+
 Fullsty is a modular fullstack framework starter built from three core parts:
 
 - `template-engine` for reactive UI rendering
