@@ -1,5 +1,9 @@
 type DriverName = 'pg' | 'mysql' | 'sqlite'
 
+import { pgWrapperAccessToken } from './pg-wrapper-access.ts'
+
+export { pgWrapperAccessToken }
+
 interface ConnectionData {
     connectionName?: string
 }
@@ -16,14 +20,15 @@ export class DbConnection {
         return this.driverName
     }
 
-    async getConnection(): Promise<unknown> {
+    async getPool(): Promise<unknown> {
         if (this.driverName === 'pg') {
             if (!this.connectionWrapper) {
                 // @ts-ignore pg-wrapper is supplied by the pg extension in generated projects.
-                const { PgConnectionWrapper } =
+                const createPgConnectionWrapper =
                     await import('../pg/pg-wrapper.ts')
-                this.connectionWrapper = new PgConnectionWrapper(
-                    this.connectionData.connectionName ?? 'default'
+                this.connectionWrapper = createPgConnectionWrapper.default(
+                    this.connectionData.connectionName ?? 'default',
+                    pgWrapperAccessToken
                 )
             }
 

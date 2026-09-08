@@ -1,0 +1,1 @@
+export const pgWrapperAccessToken = Symbol('pg-wrapper-access')

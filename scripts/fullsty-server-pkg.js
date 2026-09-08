@@ -42,5 +42,6 @@ try {
     console.error(
         `\n❌ ${error instanceof Error ? error.message : String(error)}`
     )
+    
     process.exit(1)
 }

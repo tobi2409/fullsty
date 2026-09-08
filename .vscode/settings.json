@@ -1,7 +1,0 @@
-{
-    "liveServer.settings.ignoreFiles": [
-        "**/generated/server/logs/**",
-        "**/*.log"
-    ],
-    "liveServer.settings.port": 5502
-}

@@ -1,4 +1,5 @@
 {
     "addToServerPackage": true,
+    "packageName": "drizzle-orm",
     "dependencies": ["db-connection"]
 }

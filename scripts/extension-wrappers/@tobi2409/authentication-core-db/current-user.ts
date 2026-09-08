@@ -1,6 +1,6 @@
 import { DbConnection } from '../../db-connection/db-connection-wrapper.ts'
-// @ts-ignore kysely is supplied by the server package in generated projects.
-import { KyselyWrapper } from '../../kysely/kysely-wrapper.ts'
+// @ts-ignore drizzle-orm is supplied by the server package in generated projects.
+import { DrizzleWrapper } from '../../drizzle/drizzle-wrapper.ts'
 import { authenticationCoreLib } from '../../@tobi2409/authentication-core-lib/authentication-core-lib-wrapper.ts'
 import {
     DEFAULT_TABLE_NAME,
@@ -8,7 +8,7 @@ import {
     UserColumn
 } from './shared.ts'
 
-export namespace AuthenticationCoreKyselyCurrentUser {
+export namespace AuthenticationCoreDrizzleCurrentUser {
     export async function getCurrentUser(
         token: string,
         jwtKey: Parameters<
@@ -22,36 +22,31 @@ export namespace AuthenticationCoreKyselyCurrentUser {
         >[3] = {}
     ): Promise<string> {
         try {
-            const db = KyselyWrapper.buildQueryCompiler(
+            // The wrapper only stores the driver name and is very lightweight;
+            // the pool is supplied per query context, so repeated initialization is safe.
+            const drizzleWrapper = new DrizzleWrapper(
                 dbConnection.getDriverName()
             )
+            const db = drizzleWrapper.buildQueryBuilder(
+                await dbConnection.getPool()
+            )
+            const users = drizzleWrapper.buildTable(tableName, columns, {
+                uuid: 'uuid',
+                isActive: 'boolean'
+            })
 
             const isActiveCallback = async (uuid: string): Promise<boolean> => {
-                const compiledQuery = db
-                    .selectFrom(tableName)
-                    .select([
-                        KyselyWrapper.sql.ref(columns.isActive).as('isActive')
-                    ])
-                    .where(KyselyWrapper.sql.ref(columns.uuid), '=', uuid)
+                const result = await db
+                    .select({ isActive: users.isActive })
+                    .from(users)
+                    .where(DrizzleWrapper.eq(users.uuid, uuid))
                     .limit(1)
-                    .compile()
 
-                // 'any' is used instead of 'unknown' because calling .query() on an unknown type requires
-                // either a type assertion or a separate interface. DbConnection is driver-agnostic, so
-                // the concrete pool type (e.g. pg.Pool) is not available here without adding a dependency.
-                const connection = (await dbConnection.getConnection()) as any
-                const result = await connection.query(
-                    compiledQuery.sql,
-                    compiledQuery.parameters
-                )
-
-                if (!result.rows?.[0]) {
+                if (!result[0]) {
                     return false
                 }
 
-                return Boolean(
-                    (result.rows[0] as Record<string, unknown>).isActive
-                )
+                return Boolean(result[0].isActive)
             }
 
             return authenticationCoreLib.AuthenticationCoreCurrentUser.getCurrentUser(

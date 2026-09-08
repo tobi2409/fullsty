@@ -21,26 +21,44 @@ export function handleAdd(projectDir, scriptDir, serverDir, packageNames) {
         json.dependencies = {}
     }
 
-    for (const packageName of packageNames) {
+    const processedPackages = new Set()
+
+    function addPackage(packageName) {
+        if (processedPackages.has(packageName)) {
+            return
+        }
+
+        processedPackages.add(packageName)
         const wrapperDir = wrapperDirFromPackage(scriptDir, packageName)
         const targetWrapperDir = path.join(serverDir, packageName)
         const wrapperExists = fs.existsSync(wrapperDir)
 
         if (!wrapperExists) {
             json.dependencies[packageName] = 'latest'
-            continue
+            return
         }
 
-        if (shouldAddToServerPackage(wrapperDir)) {
-            json.dependencies[packageName] = 'latest'
+        const extensionConfig = readJson(wrapperDir, EXTENSION_CONFIG_FILE)
+        for (const dependency of extensionConfig.dependencies ?? []) {
+            addPackage(dependency)
+        }
+
+        if (extensionConfig.addToServerPackage) {
+            const serverPackageName = extensionConfig.packageName ?? packageName
+            json.dependencies[serverPackageName] = 'latest'
         }
 
         copyDirectory(wrapperDir, targetWrapperDir, {
             excludedNames: [EXTENSION_CONFIG_FILE]
         })
+
         console.log(
             `\n✅ Copied wrapper for ${packageName} to src/server/${packageName}`
         )
+    }
+
+    for (const packageName of packageNames) {
+        addPackage(packageName)
     }
 
     writeJson(projectDir, 'server-package.json', json)

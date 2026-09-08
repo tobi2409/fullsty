@@ -1,6 +1,6 @@
 import { DbConnection } from '../../db-connection/db-connection-wrapper.ts'
-// @ts-ignore kysely is supplied by the server package in generated projects.
-import { KyselyWrapper } from '../../kysely/kysely-wrapper.ts'
+// @ts-ignore drizzle-orm is supplied by the server package in generated projects.
+import { DrizzleWrapper } from '../../drizzle/drizzle-wrapper.ts'
 import { authenticationCoreLib } from '../../@tobi2409/authentication-core-lib/authentication-core-lib-wrapper.ts'
 import {
     DEFAULT_TABLE_NAME,
@@ -8,7 +8,7 @@ import {
     UserColumn
 } from './shared.ts'
 
-export namespace AuthenticationCoreKyselyLogin {
+export namespace AuthenticationCoreDrizzleLogin {
     function mapFetchedUser(
         row: Record<string, unknown> | undefined
     ): authenticationCoreLib.FetchedUser | undefined {
@@ -38,34 +38,34 @@ export namespace AuthenticationCoreKyselyLogin {
         >[4] = {}
     ): Promise<string> {
         try {
-            const db = KyselyWrapper.buildQueryCompiler(
+            // The wrapper only stores the driver name and is very lightweight;
+            // the pool is supplied per query context, so repeated initialization is safe.
+            const drizzleWrapper = new DrizzleWrapper(
                 dbConnection.getDriverName()
             )
-
-            const compiledQuery = db
-                .selectFrom(tableName)
-                .select([
-                    KyselyWrapper.sql.ref(columns.uuid).as('uuid'),
-                    KyselyWrapper.sql.ref(columns.mail).as('mail'),
-                    KyselyWrapper.sql.ref(columns.password).as('password'),
-                    KyselyWrapper.sql.ref(columns.isActive).as('isActive')
-                ])
-                .where(KyselyWrapper.sql.ref(columns.mail), '=', typedMail)
-                .limit(1)
-                .compile()
-
-            // 'any' is used instead of 'unknown' because calling .query() on an unknown type requires
-            // either a type assertion or a separate interface. DbConnection is driver-agnostic, so
-            // the concrete pool type (e.g. pg.Pool) is not available here without adding a dependency.
-            const connection = (await dbConnection.getConnection()) as any
-            const result = await connection.query(
-                compiledQuery.sql,
-                compiledQuery.parameters
+            const db = drizzleWrapper.buildQueryBuilder(
+                await dbConnection.getPool()
             )
+            const users = drizzleWrapper.buildTable(tableName, columns, {
+                uuid: 'uuid',
+                isActive: 'boolean'
+            })
+
+            const result = await db
+                .select({
+                    uuid: users.uuid,
+                    mail: users.mail,
+                    password: users.password,
+                    isActive: users.isActive
+                })
+                .from(users)
+                .where(DrizzleWrapper.eq(users.mail, typedMail))
+                .limit(1)
 
             const fetchedUser = mapFetchedUser(
-                result.rows?.[0] as Record<string, unknown> | undefined
+                result[0] as Record<string, unknown> | undefined
             )
+
             return authenticationCoreLib.AuthenticationCoreLogin.login(
                 typedMail,
                 typedPassword,

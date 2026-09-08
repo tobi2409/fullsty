@@ -21,7 +21,7 @@ For the `db-test` demo, add the required server wrappers in your project root be
 ```bash
 fullsty-server-pkg add pg
 fullsty-server-pkg add db-connection
-fullsty-server-pkg add kysely
+fullsty-server-pkg add drizzle
 ```
 
 ## 1) Create a project
@@ -66,7 +66,7 @@ Run it from the project root, for example:
 
 ```bash
 fullsty-server-pkg add pg
-fullsty-server-pkg add kysely
+fullsty-server-pkg add drizzle
 fullsty-server-pkg remove pg
 ```
 
@@ -83,9 +83,14 @@ What it does:
 
 The script does not manage the project-level [package.json](project-frame/package.json).
 
+The wrapper in `scripts/extension-wrappers` is the single source of truth. The
+copied files under `src/server` and the generated files under `generated/server`
+are derived artifacts and should not be edited manually. Re-run the wrapper
+command and `npm run generate` after changing an extension or its dependencies.
+
 After `fullsty-server-pkg.js add <package>` you should run `npm run generate` again so the updated project server package file is copied into `generated/server/package.json`. After that, run `npm install` again inside [projects/demo1/generated/server](projects/demo1/generated/server) so the generated server gets the updated dependencies.
 
-`fullsty-server-pkg.js add kysely` copies [scripts/extension-wrappers/kysely/kysely-wrapper.ts](scripts/extension-wrappers/kysely/kysely-wrapper.ts) into [projects/demo1/src/server](projects/demo1/src/server). This keeps `kysely` visible as the recommended SQL style without coupling it to a specific DBMS wrapper. For PostgreSQL pooling and env handling you can add `pg` separately.
+`fullsty-server-pkg.js add drizzle` copies [scripts/extension-wrappers/drizzle/drizzle-wrapper.ts](scripts/extension-wrappers/drizzle/drizzle-wrapper.ts) into [projects/demo1/src/server](projects/demo1/src/server). This keeps Drizzle visible as the recommended SQL style without coupling it to a specific DBMS wrapper. For PostgreSQL pooling and env handling you can add `pg` separately.
 
 ## 5) Start the generated server
 

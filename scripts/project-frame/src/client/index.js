@@ -1,6 +1,6 @@
 // @server-import server.ts
 
-import TemplateEngine from 'template-engine/template-engine.js'
+import TemplateEngine from 'mvvm-monster/template-engine.js'
 
 const data = TemplateEngine.reactive(
     {

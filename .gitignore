@@ -1,7 +1,9 @@
 projects/*/src/server/pg/
 projects/*/src/server/db-connection/
-projects/*/src/server/kysely/
+projects/*/src/server/drizzle/
 projects/*/src/server/@tobi2409/
+projects/*/src/server/.env
+projects/*/src/server/.env.*
 projects/*/generated/
 projects/*/modules/
 node_modules/

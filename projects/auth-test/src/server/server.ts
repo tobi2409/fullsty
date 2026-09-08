@@ -1,14 +1,21 @@
+import dotenv from 'dotenv'
 import { DbConnection } from './db-connection/db-connection-wrapper.ts'
 import { authenticationCoreLib } from './@tobi2409/authentication-core-lib/authentication-core-lib-wrapper.ts'
-import { AuthenticationCoreKyselyLogin } from './@tobi2409/authentication-core-db/login.ts'
-import { AuthenticationCoreKyselyCurrentUser } from './@tobi2409/authentication-core-db/current-user.ts'
-import { AuthenticationCoreKyselyRegister } from './@tobi2409/authentication-core-db/register.ts'
+import { AuthenticationCoreDrizzleLogin } from './@tobi2409/authentication-core-db/login.ts'
+import { AuthenticationCoreDrizzleCurrentUser } from './@tobi2409/authentication-core-db/current-user.ts'
+import { AuthenticationCoreDrizzleRegister } from './@tobi2409/authentication-core-db/register.ts'
 
 type MailTransportConfig = authenticationCoreLib.MailTransportConfig
 type RegistrationInputData = authenticationCoreLib.RegistrationInputData
 type VerificationMail = authenticationCoreLib.VerificationMail
 
-const SECRET_KEY = 'zLp6Qzrm76vCcM3YoihruIcaYktJjc2Xt/c9qftftx4='
+dotenv.config()
+
+const SECRET_KEY = process.env.SECRET_KEY
+if (!SECRET_KEY) {
+    throw new Error('SECRET_KEY is not configured')
+}
+
 const dbConnection = new DbConnection('pg')
 
 //@rest
@@ -16,7 +23,7 @@ export async function loginUser(
     email: string,
     password: string
 ): Promise<string> {
-    return AuthenticationCoreKyselyLogin.login(
+    return AuthenticationCoreDrizzleLogin.login(
         email,
         password,
         SECRET_KEY,
@@ -52,7 +59,7 @@ export async function registerUser(
         }
     }
 
-    return await AuthenticationCoreKyselyRegister.register(
+    return await AuthenticationCoreDrizzleRegister.register(
         registrationInputData,
         {},
         verificationMail,
@@ -65,7 +72,7 @@ export async function registerUser(
 
 //@rest
 export async function getCurrentUser(token: string): Promise<string> {
-    return AuthenticationCoreKyselyCurrentUser.getCurrentUser(
+    return AuthenticationCoreDrizzleCurrentUser.getCurrentUser(
         token,
         SECRET_KEY,
         dbConnection

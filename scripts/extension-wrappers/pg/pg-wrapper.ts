@@ -8,8 +8,9 @@ import path from 'path'
 import { Pool } from 'pg'
 // @ts-ignore node types are supplied by the server package in generated projects.
 import { fileURLToPath } from 'url'
+import { pgWrapperAccessToken } from '../db-connection/pg-wrapper-access.ts'
 
-export class PgConnectionWrapper {
+class PgConnectionWrapper {
     private pool: Pool | null = null
     private pgEnv: Record<string, string> = {}
     private pgEnvLoaded: boolean = false
@@ -74,4 +75,16 @@ export class PgConnectionWrapper {
         await this.pool.end()
         this.pool = null
     }
+}
+
+export default function createPgConnectionWrapper(
+    connectionName: string = 'default',
+    accessToken?: symbol
+): PgConnectionWrapper {
+    // only accessible by DbConnection
+    if (accessToken !== pgWrapperAccessToken) {
+        throw new Error('PgConnectionWrapper can only be created by DbConnection')
+    }
+
+    return new PgConnectionWrapper(connectionName)
 }

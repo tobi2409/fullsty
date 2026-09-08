@@ -1,3 +1,8 @@
 {
-    "addToServerPackage": false
+    "addToServerPackage": false,
+    "dependencies": [
+        "db-connection",
+        "drizzle",
+        "@tobi2409/authentication-core-lib"
+    ]
 }
