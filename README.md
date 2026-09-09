@@ -4,15 +4,19 @@ ROADMAP: Platform-Independency (generate Fullsty-App as Web-App, Mobile-App, Win
 
 Fullsty is a modular fullstack framework starter built from three core parts:
 
-- `template-engine` for reactive UI rendering
-- `layout` for lightweight CSS layout composition
-- `proc2rest` for generating REST server/client code from TypeScript server functions
+- `@tobi2409/mvvm-monster` for reactive UI rendering
+- `@tobi2409/layout` for lightweight CSS layout composition
+- `@tobi2409/proc2rest` for generating REST server/client code from TypeScript server functions
 
 This repository provides a project template and scaffolding script so you can create a new project, generate API/client artifacts, and run the generated server quickly.
 
-Minimal Fullsty starter workflow.
+## Installation
 
-**It is recommended to install fullsty globally.**
+Install Fullsty globally:
+
+```bash
+npm install --global @tobi2409/fullsty
+```
 
 A sample application can be found at https://github.com/tobi2409/fullsty/tree/main/projects/db-test
 
@@ -26,7 +30,7 @@ fullsty-server-pkg add drizzle
 
 ## 1) Create a project
 
-From the repository root:
+Create a project in the desired parent directory:
 
 ```bash
 create-fullsty-project projects/demo1
@@ -58,9 +62,9 @@ This runs:
 
 It also copies [project-frame/server-package.json](project-frame/server-package.json) to `generated/server/package.json` and [project-frame/client-package.json](project-frame/client-package.json) to `generated/client/package.json`.
 
-## 4) Use `fullsty-pkg` for wrapper packages
+## 4) Use `fullsty-server-pkg` for wrapper packages
 
-`fullsty-pkg.js` is a small project helper for wrapper-aware package changes.
+`fullsty-server-pkg` is a project helper for wrapper-aware server package changes.
 
 Run it from the project root, for example:
 
@@ -70,7 +74,7 @@ fullsty-server-pkg add drizzle
 fullsty-server-pkg remove pg
 ```
 
-Alternatively, you can also use `npx fullsty-server-pkg`.
+Alternatively, run it through the Fullsty package with `npx --package @tobi2409/fullsty fullsty-server-pkg`.
 
 What it does:
 
@@ -88,9 +92,9 @@ copied files under `src/server` and the generated files under `generated/server`
 are derived artifacts and should not be edited manually. Re-run the wrapper
 command and `npm run generate` after changing an extension or its dependencies.
 
-After `fullsty-server-pkg.js add <package>` you should run `npm run generate` again so the updated project server package file is copied into `generated/server/package.json`. After that, run `npm install` again inside [projects/demo1/generated/server](projects/demo1/generated/server) so the generated server gets the updated dependencies.
+After `fullsty-server-pkg add <package>` you should run `npm run generate` again so the updated project server package file is copied into `generated/server/package.json`. After that, run `npm install` again inside [projects/demo1/generated/server](projects/demo1/generated/server) so the generated server gets the updated dependencies.
 
-`fullsty-server-pkg.js add drizzle` copies [scripts/extension-wrappers/drizzle/drizzle-wrapper.ts](scripts/extension-wrappers/drizzle/drizzle-wrapper.ts) into [projects/demo1/src/server](projects/demo1/src/server). This keeps Drizzle visible as the recommended SQL style without coupling it to a specific DBMS wrapper. For PostgreSQL pooling and env handling you can add `pg` separately.
+`fullsty-server-pkg add drizzle` copies [scripts/extension-wrappers/drizzle/drizzle-wrapper.ts](scripts/extension-wrappers/drizzle/drizzle-wrapper.ts) into [projects/demo1/src/server](projects/demo1/src/server). This keeps Drizzle visible as the recommended SQL style without coupling it to a specific DBMS wrapper. For PostgreSQL pooling and env handling you can add `pg` separately.
 
 ## 5) Start the generated server
 
@@ -134,7 +138,7 @@ To prevent Live Server from reloading when server logs are written, add this to 
 
 ## Quick summary
 
-1. `node create-project.js projects/<project-name>`
+1. `create-fullsty-project projects/<project-name>`
 2. `cd projects/<project-name>`
 3. `npm install`
 4. `npm run generate`
