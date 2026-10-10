@@ -1,14 +1,14 @@
+import SQLQueryBuilder from '@tobi2409/sql-query-builder'
 import { DbConnection } from '../../db-connection/db-connection-wrapper.ts'
-// @ts-ignore drizzle-orm is supplied by the server package in generated projects.
-import { DrizzleWrapper } from '../../drizzle/drizzle-wrapper.ts'
 import { authenticationCoreLib } from '../../@tobi2409/authentication-core-lib/authentication-core-lib-wrapper.ts'
 import {
     DEFAULT_TABLE_NAME,
     DEFAULT_USER_COLUMN,
+    quoteIdentifier,
     UserColumn
 } from './shared.ts'
 
-export namespace AuthenticationCoreDrizzleRegister {
+export namespace AuthenticationCoreDbRegister {
     function mapFetchedUser(
         row: Record<string, unknown> | undefined
     ): authenticationCoreLib.FetchedUser | undefined {
@@ -38,28 +38,23 @@ export namespace AuthenticationCoreDrizzleRegister {
             typeof authenticationCoreLib.AuthenticationCoreRegister.register
         >[6]
     ): Promise<authenticationCoreLib.FetchedUser> {
-        // The wrapper only stores the driver name and is very lightweight;
-        // the pool is supplied per query context, so repeated initialization is safe.
-        const drizzleWrapper = new DrizzleWrapper(
-            dbConnection.getDriverName()
-        )
-        const db = drizzleWrapper.buildQueryBuilder(
-            await dbConnection.getPool()
-        )
-        const users = drizzleWrapper.buildTable(tableName, columns, {
-            uuid: 'uuid',
-            isActive: 'boolean'
-        })
+        const pool = (await dbConnection.getPool()) as any
+        const transaction = await pool.connect()
 
-        return db.transaction(async (transactionDb: any) => {
+        try {
+            await transaction.query('BEGIN')
+
             const mailExistsRoutine = async (mail: string): Promise<boolean> => {
-                const result = await transactionDb
-                    .select({ mail: users.mail })
-                    .from(users)
-                    .where(DrizzleWrapper.eq(users.mail, mail))
+                const query = new SQLQueryBuilder(dbConnection.getDriverName())
+                    .select([quoteIdentifier(columns.mail)])
+                    .from(quoteIdentifier(tableName))
+                    .where(`${quoteIdentifier(columns.mail)} = ?`, [mail])
                     .limit(1)
+                    .toSQL()
 
-                return result.length > 0
+                const result = await transaction.query(query.text, query.values)
+
+                return result.rows.length > 0
             }
 
             const dataProcessing = async (
@@ -74,33 +69,28 @@ export namespace AuthenticationCoreDrizzleRegister {
                     ...inputData
                 }
 
-                const insertUsers = drizzleWrapper.buildTable(
-                    tableName,
-                    Object.fromEntries(
-                        Object.keys({ ...columns, ...userData }).map((column) => [
-                            column,
-                            columns[column as keyof UserColumn] ?? column
-                        ])
-                    ),
-                    { uuid: 'uuid', isActive: 'boolean' }
-                )
+                const query = new SQLQueryBuilder(dbConnection.getDriverName())
+                    .insertInto(
+                        quoteIdentifier(tableName),
+                        Object.keys(userData).map(quoteIdentifier)
+                    )
+                    .values(Object.values(userData))
+                    .returning([
+                        `${quoteIdentifier(columns.uuid)} AS "uuid"`,
+                        `${quoteIdentifier(columns.mail)} AS "mail"`,
+                        `${quoteIdentifier(columns.password)} AS "password"`,
+                        `${quoteIdentifier(columns.isActive)} AS "isActive"`
+                    ])
+                    .toSQL()
 
-                const result = await transactionDb
-                    .insert(insertUsers)
-                    .values(userData)
-                    .returning({
-                        uuid: insertUsers.uuid,
-                        mail: insertUsers.mail,
-                        password: insertUsers.password,
-                        isActive: insertUsers.isActive
-                    })
+                const result = await transaction.query(query.text, query.values)
 
                 return mapFetchedUser(
-                    result[0] as Record<string, unknown> | undefined
+                    result.rows[0] as Record<string, unknown> | undefined
                 )
             }
 
-            return authenticationCoreLib.AuthenticationCoreRegister.register(
+            const registeredUser = await authenticationCoreLib.AuthenticationCoreRegister.register(
                 registrationInputData,
                 mailExistsRoutine,
                 customInputData,
@@ -109,7 +99,14 @@ export namespace AuthenticationCoreDrizzleRegister {
                 mailTransportConfig,
                 hashOptions
             )
-        })
+            await transaction.query('COMMIT')
+            return registeredUser
+        } catch (error) {
+            await transaction.query('ROLLBACK')
+            throw error
+        } finally {
+            transaction.release()
+        }
     }
 
     export async function activateMail(
@@ -118,24 +115,13 @@ export namespace AuthenticationCoreDrizzleRegister {
         tableName: string = DEFAULT_TABLE_NAME,
         columns: UserColumn = DEFAULT_USER_COLUMN
     ): Promise<void> {
-        // The wrapper only stores the driver name and is very lightweight;
-        // the pool is supplied per query context, so repeated initialization is safe.
-        const drizzleWrapper = new DrizzleWrapper(
-            dbConnection.getDriverName()
-        )
-
-        const db = drizzleWrapper.buildQueryBuilder(
-            await dbConnection.getPool()
-        )
-
-        const users = drizzleWrapper.buildTable(tableName, columns, {
-            uuid: 'uuid',
-            isActive: 'boolean'
-        })
-
-        await db
-            .update(users)
-            .set({ [columns.isActive]: true })
-            .where(DrizzleWrapper.eq(users.uuid, uuid))
+        const query = new SQLQueryBuilder(dbConnection.getDriverName())
+            .update(quoteIdentifier(tableName))
+            .setRaw(`${quoteIdentifier(columns.isActive)} = ?`, [true])
+            .where(`${quoteIdentifier(columns.uuid)} = ?`, [uuid])
+            .toSQL()
+            
+        const connection = (await dbConnection.getPool()) as any
+        await connection.query(query.text, query.values)
     }
 }

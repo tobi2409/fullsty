@@ -13,3 +13,10 @@ export const DEFAULT_USER_COLUMN: UserColumn = {
     password: 'password',
     isActive: 'isActive'
 }
+
+export function quoteIdentifier(identifier: string): string {
+    return identifier
+        .split('.')
+        .map((part) => `"${part.replaceAll('"', '""')}"`)
+        .join('.')
+}

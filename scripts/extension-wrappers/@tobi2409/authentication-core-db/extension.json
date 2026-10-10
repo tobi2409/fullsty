@@ -2,7 +2,7 @@
     "addToServerPackage": false,
     "dependencies": [
         "db-connection",
-        "drizzle",
+        "@tobi2409/sql-query-builder",
         "@tobi2409/authentication-core-lib"
     ]
 }

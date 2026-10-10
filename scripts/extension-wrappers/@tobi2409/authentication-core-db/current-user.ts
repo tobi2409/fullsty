@@ -1,14 +1,14 @@
+import SQLQueryBuilder from '@tobi2409/sql-query-builder'
 import { DbConnection } from '../../db-connection/db-connection-wrapper.ts'
-// @ts-ignore drizzle-orm is supplied by the server package in generated projects.
-import { DrizzleWrapper } from '../../drizzle/drizzle-wrapper.ts'
 import { authenticationCoreLib } from '../../@tobi2409/authentication-core-lib/authentication-core-lib-wrapper.ts'
 import {
     DEFAULT_TABLE_NAME,
     DEFAULT_USER_COLUMN,
+    quoteIdentifier,
     UserColumn
 } from './shared.ts'
 
-export namespace AuthenticationCoreDrizzleCurrentUser {
+export namespace AuthenticationCoreDbCurrentUser {
     export async function getCurrentUser(
         token: string,
         jwtKey: Parameters<
@@ -22,31 +22,23 @@ export namespace AuthenticationCoreDrizzleCurrentUser {
         >[3] = {}
     ): Promise<string> {
         try {
-            // The wrapper only stores the driver name and is very lightweight;
-            // the pool is supplied per query context, so repeated initialization is safe.
-            const drizzleWrapper = new DrizzleWrapper(
-                dbConnection.getDriverName()
-            )
-            const db = drizzleWrapper.buildQueryBuilder(
-                await dbConnection.getPool()
-            )
-            const users = drizzleWrapper.buildTable(tableName, columns, {
-                uuid: 'uuid',
-                isActive: 'boolean'
-            })
+            const connection = (await dbConnection.getPool()) as any
 
             const isActiveCallback = async (uuid: string): Promise<boolean> => {
-                const result = await db
-                    .select({ isActive: users.isActive })
-                    .from(users)
-                    .where(DrizzleWrapper.eq(users.uuid, uuid))
+                const query = new SQLQueryBuilder(dbConnection.getDriverName())
+                    .select([`${quoteIdentifier(columns.isActive)} AS "isActive"`])
+                    .from(quoteIdentifier(tableName))
+                    .where(`${quoteIdentifier(columns.uuid)} = ?`, [uuid])
                     .limit(1)
+                    .toSQL()
+                    
+                const result = await connection.query(query.text, query.values)
 
-                if (!result[0]) {
+                if (!result.rows[0]) {
                     return false
                 }
 
-                return Boolean(result[0].isActive)
+                return Boolean(result.rows[0].isActive)
             }
 
             return authenticationCoreLib.AuthenticationCoreCurrentUser.getCurrentUser(

@@ -30,11 +30,12 @@ const data = TemplateEngine.reactive(
             statusColor: 'black',
             okClick: async () => {
                 try {
-                    const fetchedUser = await Server.registerUser(
+                    const uuid = await Server.registerUser(
                         data.registerSection.email,
                         data.registerSection.password
                     )
-                    data.registerSection.statusMessage = `New user registered with UUID: ${fetchedUser.uuid}`
+                    
+                    data.registerSection.statusMessage = `New user registered with UUID: ${uuid}`
                     data.registerSection.statusColor = 'green'
                 } catch (error) {
                     data.registerSection.statusMessage = `Registration failed. Error: ${error}`

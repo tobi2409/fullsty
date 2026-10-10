@@ -1,9 +1,9 @@
 import dotenv from 'dotenv'
 import { DbConnection } from './db-connection/db-connection-wrapper.ts'
 import { authenticationCoreLib } from './@tobi2409/authentication-core-lib/authentication-core-lib-wrapper.ts'
-import { AuthenticationCoreDrizzleLogin } from './@tobi2409/authentication-core-db/login.ts'
-import { AuthenticationCoreDrizzleCurrentUser } from './@tobi2409/authentication-core-db/current-user.ts'
-import { AuthenticationCoreDrizzleRegister } from './@tobi2409/authentication-core-db/register.ts'
+import { AuthenticationCoreDbLogin } from './@tobi2409/authentication-core-db/login.ts'
+import { AuthenticationCoreDbCurrentUser } from './@tobi2409/authentication-core-db/current-user.ts'
+import { AuthenticationCoreDbRegister } from './@tobi2409/authentication-core-db/register.ts'
 
 type MailTransportConfig = authenticationCoreLib.MailTransportConfig
 type RegistrationInputData = authenticationCoreLib.RegistrationInputData
@@ -23,7 +23,7 @@ export async function loginUser(
     email: string,
     password: string
 ): Promise<string> {
-    return AuthenticationCoreDrizzleLogin.login(
+    return AuthenticationCoreDbLogin.login(
         email,
         password,
         SECRET_KEY,
@@ -35,7 +35,7 @@ export async function loginUser(
 export async function registerUser(
     email: string,
     password: string
-): Promise<void> {
+): Promise<string> {
     const registrationInputData: RegistrationInputData = {
         typedMail: email,
         typedPassword: password,
@@ -59,7 +59,7 @@ export async function registerUser(
         }
     }
 
-    return await AuthenticationCoreDrizzleRegister.register(
+    const registeredUser = await AuthenticationCoreDbRegister.register(
         registrationInputData,
         {},
         verificationMail,
@@ -68,11 +68,13 @@ export async function registerUser(
         undefined,
         mailTransportConfig
     )
+
+    return registeredUser.uuid
 }
 
 //@rest
 export async function getCurrentUser(token: string): Promise<string> {
-    return AuthenticationCoreDrizzleCurrentUser.getCurrentUser(
+    return AuthenticationCoreDbCurrentUser.getCurrentUser(
         token,
         SECRET_KEY,
         dbConnection
