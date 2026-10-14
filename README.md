@@ -58,9 +58,11 @@ npm run generate
 This runs:
 
 - `generate-server` (creates server output in [projects/demo1/generated/server](projects/demo1/generated/server))
-- `generate-client` (creates client output in [projects/demo1/generated/client](projects/demo1/generated/client))
+- `generate-client` (creates client output with `proc2rest-client`, then recursively processes its HTML files with `layout` in [projects/demo1/generated/client](projects/demo1/generated/client))
 
 It also copies [project-frame/server-package.json](project-frame/server-package.json) to `generated/server/package.json` and [project-frame/client-package.json](project-frame/client-package.json) to `generated/client/package.json`.
+
+The layout step processes all HTML files below `generated/client` in place and adds a matching `*-layout.css` and `*-layout.js` beside each one. The source files under `src/client` remain unchanged.
 
 ## 4) Use `fullsty-server-pkg` for wrapper packages
 

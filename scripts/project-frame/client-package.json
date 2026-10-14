@@ -4,6 +4,6 @@
     "type": "module",
     "dependencies": {
         "@tobi2409/mvvm-monster": "0.9.16",
-        "@tobi2409/layout": "0.5.0"
+        "@tobi2409/layout": "0.9.1"
     }
 }
