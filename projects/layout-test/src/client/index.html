@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "mvvm-monster/": "./node_modules/@tobi2409/mvvm-monster/src/"
+                }
+            }
+        </script>
+
+        <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="index-layout.css"><script type="module" src="index-layout.js"></script></head>
+    <body>
+        <div id="app"></div>
+
+        <template id="app-template">
+            <h1>👋 Hello, <get>name</get></h1>
+
+            <p><get>serverMessage</get></p>
+
+            <div class="frame">
+                <div @align="left" style="background-color: lightgray;">
+                    Left
+                </div>
+
+                <div @align="right" style="background-color: lightblue;">
+                    Right
+                </div>
+
+                <div @align='{"default": "right", "max-width: 600px": "bottom"}' style="background-color: lightgreen;">
+                    Right-2
+                </div>
+            </div>
+        </template>
+
+        <template-use id="app-template-use" template-id="app-template" mount-id="app">
+        </template-use>
+
+        <script type="module" src="index.js"></script>
+    
+
+</body></html>
