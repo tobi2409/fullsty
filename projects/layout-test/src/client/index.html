@@ -6,7 +6,8 @@
         <script type="importmap">
             {
                 "imports": {
-                    "mvvm-monster/": "./node_modules/@tobi2409/mvvm-monster/src/"
+                    "mvvm-monster/": "./node_modules/@tobi2409/mvvm-monster/src/",
+                    "layout/": "./node_modules/@tobi2409/layout/src/"
                 }
             }
         </script>
@@ -40,6 +41,14 @@
                 <div @align='{"default": "right", "max-width: 600px": "bottom"}' style="background-color: lightgreen;">
                     Right-2
                 </div>
+            </div>
+
+            <div class="frame">
+                <each of="todos" as="todo">
+                    <div class="todo">
+                        <get>todo.text</get> - <get>todo.done</get>
+                    </div>
+                </each>
             </div>
         </template>
 
